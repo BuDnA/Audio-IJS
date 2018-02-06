@@ -1,6 +1,6 @@
 import sysconfig
 # Category metadata.
-NAME = "Audio Orange"
+NAME = "Audio-IJS"
 # Category icon show in the menu
 ICON = "icons/category.svg"
 

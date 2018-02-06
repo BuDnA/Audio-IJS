@@ -5,19 +5,32 @@ from os import path, walk
 import sys
 from setuptools import setup, find_packages
 
-NAME = "Orange3-Audio"
+NAME = "Orange3-Audio-IJS"
 
-VERSION = "0.0.3"
+VERSION = "0.1"
 
-DESCRIPTION = "Add-on containing audio widgets"
+AUTHOR = 'Department of Intelligent Systems | Jožef Stefan Institute - IJS'
+AUTHOR_EMAIL = 'info@ijs.si'
+
+URL = 'https://github.com/BuDnA/Audio-IJS'
+DESCRIPTION = "Add-on for audio preprocessing and classification."
 LONG_DESCRIPTION = open(path.join(path.dirname(__file__), 'README.md')).read()
 
-LICENSE = "BSD"
+LICENSE = "GSL3+"
+
+CLASSIFIERS = [
+    'Development Status :: 1 - Planning',
+    'Intended Audience :: Education',
+    'Intended Audience :: Science/Research',
+    'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+    'Programming Language :: Python :: 3 :: Only'
+]
 
 KEYWORDS = (
     # [PyPi](https://pypi.python.org) packages with keyword "orange3 add-on"
     # can be installed using the Orange Add-on Manager
     'orange3 add-on',
+    'orange3-audio-ijs'
 )
 
 PACKAGES = find_packages()
@@ -90,6 +103,9 @@ if __name__ == '__main__':
     setup(
         name=NAME,
         version=VERSION,
+	author=AUTHOR,
+        author_email=AUTHOR_EMAIL,
+	url=URL,
         description=DESCRIPTION,
         long_description=LONG_DESCRIPTION,
         license=LICENSE,
@@ -99,6 +115,7 @@ if __name__ == '__main__':
         install_requires=INSTALL_REQUIRES,
         entry_points=ENTRY_POINTS,
         keywords=KEYWORDS,
+	classifiers=CLASSIFIERS,
         namespace_packages=NAMESPACE_PACKAGES,
         test_suite=TEST_SUITE,
         include_package_data=True,
