@@ -119,19 +119,24 @@ class OWSpectrogram(widget.OWWidget):
 
         self.reset_all_data()
 
-        if dataset is not None and (not bool(dataset) or not len(dataset.domain)):
-            dataset = None
-        self.dataset = dataset
+        if dataset is not None:
+            self.dataset = dataset
 
         if dataset:
             self.file_icon = QIcon(QPixmap("/home/borut/Downloads/index.jpeg"))
-            self.file_names = [(str(d.get_class()) + os.sep + d.metas[0], self.file_icon) for d in dataset]
-            self.file_names_settings = self.file_names[0]
 
             if self.dataset.Y != []:
+                self.file_names = [(str(d.get_class()) + os.sep + d.metas[0], self.file_icon) for d in dataset]
+                self.file_names_settings = self.file_names[0]
                 self.category_icon = QIcon(QPixmap("/home/borut/Downloads/Tag-512.png"))
                 self.categories = [(var, self.category_icon) for var in self.dataset.domain.class_var.values]
                 self.categories_settings = self.categories[0]
+
+            else:
+                self.file_names = [(d.metas[0], self.file_icon) for d in dataset]
+                self.file_names_settings = self.file_names[0]
+                self.category_icon = QIcon(QPixmap("/home/borut/Downloads/Tag-512.png"))
+                self.categories = []
 
             self.plot(self.dataset.metas[0][1])
 
@@ -154,11 +159,19 @@ class OWSpectrogram(widget.OWWidget):
 
         if self.file_names_settings != []:
             selectedFile = self.file_names[self.file_names_settings[-1]][0]
-            category = selectedFile.split(os.sep)[0]
-            fileName = selectedFile.split(os.sep)[1]
-            for d in self.dataset:
-                if d.get_class() == category and d.metas[0] == fileName:
-                    self.plot(d.metas[1])
+            split_selectedFile = selectedFile.split(os.sep)
+
+            if len(split_selectedFile) == 1:
+                for d in self.dataset:
+                    if d.metas[0] == split_selectedFile[0]:
+                        self.plot(d.metas[1])
+
+            else:
+                category = selectedFile.split(os.sep)[0]
+                fileName = selectedFile.split(os.sep)[1]
+                for d in self.dataset:
+                    if d.get_class() == category and d.metas[0] == fileName:
+                        self.plot(d.metas[1])
 
 
 
@@ -240,4 +253,3 @@ class OWSpectrogram(widget.OWWidget):
 
             path = "".join(f + os.sep for f in dir.split(os.sep)[:-1])
             plt.savefig(path + fileName + ".png")
-

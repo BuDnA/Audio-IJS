@@ -7,7 +7,8 @@ from orangecontrib.audio.helper_scripts.htkmfc import *
 from orangecontrib.audio.helper_scripts.audioFeatureExtraction import *
 from orangecontrib.audio.helper_scripts.audioTrainTest import *
 
-class   FeatureExtraction:
+
+class FeatureExtraction:
     def __init__(self):
         self.DETACHED_PROCESS = 8
 
@@ -27,10 +28,12 @@ class   FeatureExtraction:
 
         if platform == "linux" or platform == "linux2" or platform == "darwin":
             smile_path = dir_path + "/feature_extraction/Linux/SMILExtract"
-            subprocess.check_output([smile_path, "-C", config_path, "-I", file_name, "-O", output_path])
+            subprocess.check_output([smile_path, "-C", config_path,
+                                     "-I", file_name, "-O", output_path])
         else:
             smile_path = dir_path + "/feature_extraction/Win32/SMILExtract_Release"
-            subprocess.check_output([smile_path, "-C", config_path, "-I", file_name, "-O", output_path], creationflags=self.DETACHED_PROCESS)
+            subprocess.check_output([smile_path, "-C", config_path, "-I", file_name,
+                                     "-O", output_path], creationflags=self.DETACHED_PROCESS)
 
         output_data = arff.load(open(output_path, 'r'))
         os.remove(output_path)
@@ -65,10 +68,12 @@ class   FeatureExtraction:
 
         if platform == "linux" or platform == "linux2" or platform == "darwin":
             smile_path = dir_path + "/feature_extraction/Linux/SMILExtract"
-            subprocess.check_output([smile_path, "-C", config_path, "-I", file_name, "-O", output_path])
+            subprocess.check_output([smile_path, "-C", config_path, "-I",
+                                     file_name, "-O", output_path])
         else:
             smile_path = dir_path + "/feature_extraction/Win32/SMILExtract_Release"
-            subprocess.check_output([smile_path, "-C", config_path, "-I", file_name, "-O", output_path], creationflags=self.DETACHED_PROCESS)
+            subprocess.check_output([smile_path, "-C", config_path, "-I", file_name,
+                                     "-O", output_path], creationflags=self.DETACHED_PROCESS)
 
         output_data = open_htk(output_path)
         array = list(numpy.mean(output_data.getall(), axis=0))
@@ -91,10 +96,12 @@ class   FeatureExtraction:
 
         if platform == "linux" or platform == "linux2" or platform == "darwin":
             smile_path = dir_path + "/feature_extraction/Linux/SMILExtract"
-            subprocess.check_output([smile_path, "-C", config_path, "-I", file_name, "-O", output_path])
+            subprocess.check_output([smile_path, "-C", config_path, "-I",
+                                     file_name, "-O", output_path])
         else:
             smile_path = dir_path + "/feature_extraction/Win32/SMILExtract_Release"
-            subprocess.check_output([smile_path, "-C", config_path, "-I", file_name, "-O", output_path], creationflags=self.DETACHED_PROCESS)
+            subprocess.check_output([smile_path, "-C", config_path, "-I",
+                                     file_name, "-O", output_path], creationflags=self.DETACHED_PROCESS)
 
         with open(output_path, "rb") as f:
             output_data = []

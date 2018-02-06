@@ -45,18 +45,39 @@ class OWSegmentationn(widget.OWWidget):
         self.new_tmp_dirs = []
 
         info_box = gui.widgetBox(self.controlArea, "Info")
-        self.info = gui.widgetLabel(info_box, 'No data on input yet, waiting to get something.')
+        self.info = gui.widgetLabel(
+            info_box, 'No data on input yet, waiting to get something.')
 
         parameters_box = gui.widgetBox(self.controlArea, 'Parameters')
 
         self.window_size_spin = gui.spin(
-            parameters_box, self, "window_size", minv=0.01, maxv=10000, controlWidth=80,
-            alignment=Qt.AlignRight, label="Window size [s]: ", spinType=float, decimals=2)
+            parameters_box,
+            self,
+            "window_size",
+            minv=0.01,
+            maxv=10000,
+            controlWidth=80,
+            alignment=Qt.AlignRight,
+            label="Window size [s]: ",
+            spinType=float,
+            decimals=2)
         self.overlap_spin = gui.spin(
-            parameters_box, self, "overlap", minv=0.01, maxv=10000, controlWidth=80,
-            alignment=Qt.AlignRight, label="Overlap [s]: ", spinType=float, decimals=2)
+            parameters_box,
+            self,
+            "overlap",
+            minv=0.01,
+            maxv=10000,
+            controlWidth=80,
+            alignment=Qt.AlignRight,
+            label="Overlap [s]: ",
+            spinType=float,
+            decimals=2)
 
-        self.segment_button = gui.button(self.controlArea, self, "Segment", callback=lambda: self.call_segmetation())
+        self.segment_button = gui.button(
+            self.controlArea,
+            self,
+            "Segment",
+            callback=lambda: self.call_segmetation())
 
     def set_data(self, dataset):
         """
@@ -71,7 +92,8 @@ class OWSegmentationn(widget.OWWidget):
             self.data = dataset
 
         else:
-            self.info.setText('No data on input yet, waiting to get something.')
+            self.info.setText(
+                'No data on input yet, waiting to get something.')
             self.send("Segmentation", None)
 
     def call_segmetation(self):
@@ -90,14 +112,17 @@ class OWSegmentationn(widget.OWWidget):
         try:
             segmentation = Segmentation()
             if self.window_size > max(self.data.metas[:, -2]):
-                 self.info.setStyleSheet(error_red)
-                 self.info.setText("Window size must be lower than largest sound clip!")
-                 return
+                self.info.setStyleSheet(error_red)
+                self.info.setText(
+                    "Window size must be lower than largest sound clip!")
+                return
             elif self.overlap > max(self.data.metas[:, -2]):
-                 self.info.setStyleSheet(error_red)
-                 self.info.setText("Overlap must be lower than largest sound clip!")
-                 return
-            data = segmentation.segment_all(self.data, self.window_size, self.overlap, self.tmp_dir_id)
+                self.info.setStyleSheet(error_red)
+                self.info.setText(
+                    "Overlap must be lower than largest sound clip!")
+                return
+            data = segmentation.segment_all(
+                self.data, self.window_size, self.overlap, self.tmp_dir_id)
 
         except Exception as ex:
             error = ex
@@ -108,21 +133,30 @@ class OWSegmentationn(widget.OWWidget):
             self.info.setText("Segmentation successful")
 
             if data[0] != []:
-                Y = DiscreteVariable.make("Target class", values=self.data.domain.class_var.values, ordered=True)
+                Y = DiscreteVariable.make(
+                    "Target class",
+                    values=self.data.domain.class_var.values,
+                    ordered=True)
             else:
                 Y = None
 
             segment_var = Orange.data.StringVariable("segment name")
             sound_var = Orange.data.StringVariable("sound")
             sound_var.attributes["type"] = "sound"
-            size_var = Orange.data.ContinuousVariable("segment size", number_of_decimals=0)
-            length_var = Orange.data.ContinuousVariable("segment length", number_of_decimals=2)
-            framerate_var = Orange.data.ContinuousVariable("segment framerate", number_of_decimals=0)
+            size_var = Orange.data.ContinuousVariable(
+                "segment size", number_of_decimals=0)
+            length_var = Orange.data.ContinuousVariable(
+                "segment length", number_of_decimals=2)
+            framerate_var = Orange.data.ContinuousVariable(
+                "segment framerate", number_of_decimals=0)
 
-            domain = Orange.data.Domain([], [Y] if Y is not None else [], [segment_var, sound_var, size_var, length_var, framerate_var])
+            domain = Orange.data.Domain(
+                [], [Y] if Y is not None else [], [
+                    segment_var, sound_var, size_var, length_var, framerate_var])
 
             if len(data[0]):
-                table = Orange.data.Table.from_numpy(domain, numpy.empty((len(data[0]), 0), dtype=float), data[0], data[1])
+                table = Orange.data.Table.from_numpy(domain, numpy.empty(
+                    (len(data[0]), 0), dtype=float), data[0], data[1])
             else:
                 table = None
 
@@ -144,7 +178,3 @@ class OWSegmentationn(widget.OWWidget):
             import shutil
             for i in self.new_tmp_dirs:
                 shutil.rmtree(i)
-
-
-
-

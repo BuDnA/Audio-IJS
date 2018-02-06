@@ -228,9 +228,9 @@ class OWImportSounds(widget.OWWidget):
 
         self.recent_paths = recent_paths
 
-        if self.currentPath is not None and \
-                os.path.isdir(self.currentPath) and self.recent_paths and \
-                os.path.samefile(self.currentPath, self.recent_paths[0].abspath):
+        if self.currentPath is not None and os.path.isdir(
+                self.currentPath) and self.recent_paths and os.path.samefile(
+                self.currentPath, self.recent_paths[0].abspath):
             self.recent_cb.setCurrentIndex(0)
         else:
             self.currentPath = None
@@ -586,11 +586,11 @@ class OWImportSounds(widget.OWWidget):
             sound_var.attributes["type"] = "sound"
             # file size/length
             size_var = Orange.data.ContinuousVariable(
-                 "size", number_of_decimals=0)
+                "size", number_of_decimals=0)
             length_var = Orange.data.ContinuousVariable(
-                 "length", number_of_decimals=2)
+                "length", number_of_decimals=2)
             framerate_var = Orange.data.ContinuousVariable(
-                 "framerate", number_of_decimals=0
+                "framerate", number_of_decimals=0
             )
             domain = Orange.data.Domain(
                 [], [cat_var] if cat_var is not None else [],
@@ -602,7 +602,8 @@ class OWImportSounds(widget.OWWidget):
             for soundmeta in self._soundMeta:
                 if soundmeta.isvalid:
                     if cat_var is not None:
-                        category = categories.get(os.path.dirname(soundmeta.path))
+                        category = categories.get(
+                            os.path.dirname(soundmeta.path))
                         cat_data.append([cat_var.to_val(category)])
                     else:
                         cat_data.append([])
@@ -629,8 +630,6 @@ class OWImportSounds(widget.OWWidget):
             table = None
 
         self.send("Data", table)
-
-
 
     def onDeleteWidget(self):
         self.cancel()
@@ -678,6 +677,7 @@ class UserInterruptError(BaseException):
     """
     pass
 
+
 DefaultFormats = ("wav", "mp3")
 
 
@@ -718,9 +718,9 @@ class ImageScan:
 
         if batch and self.report_progress is not None:
             self.report_progress(
-                    namespace(count=len(soundmeta),
-                              lastpath=soundmeta[-1].path,
-                              batch=batch))
+                namespace(count=len(soundmeta),
+                          lastpath=soundmeta[-1].path,
+                          batch=batch))
 
         return soundmeta
 
@@ -770,7 +770,7 @@ def scan(topdir, include_patterns=("*",), exclude_patterns=(".*",)):
 
         filenames = [fname for fname in filenames
                      if matches_any(fname, include_patterns)
-                        and not matches_any(fname, exclude_patterns)]
+                     and not matches_any(fname, exclude_patterns)]
 
         yield from (os.path.join(dirpath, fname) for fname in filenames)
 
@@ -801,7 +801,8 @@ SoundDataError.isvalid = property(lambda self: False)
 
 def sound_meta_data(path):
     data = read(path)
-    return SoundData(path, "wav", len(data[1]), float(len(data[1])) / float(data[0]), data[0])
+    return SoundData(path, "wav", len(data[1]), float(
+        len(data[1])) / float(data[0]), data[0])
 
 
 def main(argv=sys.argv):
@@ -822,6 +823,7 @@ def main(argv=sys.argv):
     w.saveSettings()
     w.onDeleteWidget()
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

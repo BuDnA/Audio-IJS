@@ -12,16 +12,12 @@ import sys
 
 error_red = 'QWidget { color:#f9221b;}'
 success_green = 'QWidget { color:#42f442;}'
+Phonon_support = True
 
 try:
     from PyQt4.phonon import Phonon
 except ImportError:
-    app = QtGui.QApplication(sys.argv)
-    QtGui.QMessageBox.critical(None, "Music Player",
-            "Your Qt installation does not have Phonon support.",
-            QtGui.QMessageBox.Ok | QtGui.QMessageBox.Default,
-            QtGui.QMessageBox.NoButton)
-    sys.exit(1)
+    Phonon_support = False
 
 class OWAudioPlayer(widget.OWWidget):
     name = "Audio Player"
@@ -41,7 +37,14 @@ class OWAudioPlayer(widget.OWWidget):
         super().__init__()
 
         info_box = gui.widgetBox(self.controlArea, "Info")
-        self.info = gui.widgetLabel(info_box, 'No data on input yet, waiting to get something.')
+
+        if not Phonon_support:
+            self.info = gui.widgetLabel(
+                info_box, "Your Qt installation does not have Phonon support.")
+            return
+
+        self.info = gui.widgetLabel(
+            info_box, 'No data on input yet, waiting to get something.')
 
         self.files_combo = gui.comboBox(self.controlArea, self, "file_id",
                                         box="File names"
@@ -77,8 +80,14 @@ class OWAudioPlayer(widget.OWWidget):
         if dataset is not None:
             self.info.setText('%d instances in input data set' % len(dataset))
             self.data = dataset
+            print(self.data.metas[:, 0])
+            if self.data.Y != []:
+                self.file_names = [str(x) + "/" + str(y) for x,
+                               y in zip([i.get_class() for i in self.data],
+                                    self.data.metas[:,0])]
+            else:
+                self.file_names = self.data.metas[:,0]
 
-            self.file_names = [str(x) + "/" + str(y) for x,y in zip([i.get_class() for i in self.data], self.data.metas[:, 0])]
             self.files_combo.addItems(self.file_names)
 
             for string in self.data.metas[:, 1]:
@@ -86,8 +95,8 @@ class OWAudioPlayer(widget.OWWidget):
             if self.sources:
                 self.metaInformationResolver.setCurrentSource(self.sources[0])
         else:
-            self.info.setText('No data on input yet, waiting to get something.')
-
+            self.info.setText(
+                'No data on input yet, waiting to get something.')
 
     def handleFilesCombo(self):
         """
@@ -115,10 +124,10 @@ class OWAudioPlayer(widget.OWWidget):
         if newState == Phonon.ErrorState:
             if self.mediaObject.errorType() == Phonon.FatalError:
                 QtGui.QMessageBox.warning(self, "Fatal Error",
-                        self.mediaObject.errorString())
+                                          self.mediaObject.errorString())
             else:
                 QtGui.QMessageBox.warning(self, "Error",
-                        self.mediaObject.errorString())
+                                          self.mediaObject.errorString())
 
         elif newState == Phonon.PlayingState:
             self.playAction.setEnabled(False)
@@ -155,7 +164,6 @@ class OWAudioPlayer(widget.OWWidget):
         """
         self.timeLcd.display('00:00')
 
-
     def setupActions(self):
         """
         Define basics 3 actions:
@@ -167,19 +175,19 @@ class OWAudioPlayer(widget.OWWidget):
         """
 
         self.playAction = QtGui.QAction(
-                self.style().standardIcon(QtGui.QStyle.SP_MediaPlay), "Play",
-                self, shortcut="Ctrl+P", enabled=False,
-                triggered=self.mediaObject.play)
+            self.style().standardIcon(QtGui.QStyle.SP_MediaPlay), "Play",
+            self, shortcut="Ctrl+P", enabled=False,
+            triggered=self.mediaObject.play)
 
         self.pauseAction = QtGui.QAction(
-                self.style().standardIcon(QtGui.QStyle.SP_MediaPause),
-                "Pause", self, shortcut="Ctrl+A", enabled=False,
-                triggered=self.mediaObject.pause)
+            self.style().standardIcon(QtGui.QStyle.SP_MediaPause),
+            "Pause", self, shortcut="Ctrl+A", enabled=False,
+            triggered=self.mediaObject.pause)
 
         self.stopAction = QtGui.QAction(
-                self.style().standardIcon(QtGui.QStyle.SP_MediaStop), "Stop",
-                self, shortcut="Ctrl+S", enabled=False,
-                triggered=self.mediaObject.stop)
+            self.style().standardIcon(QtGui.QStyle.SP_MediaStop), "Stop",
+            self, shortcut="Ctrl+S", enabled=False,
+            triggered=self.mediaObject.stop)
 
     def setupMusicGui(self):
         """
@@ -188,50 +196,51 @@ class OWAudioPlayer(widget.OWWidget):
         :return: Void
         """
 
-        #Define GUI components for 3 basics actions
+        # Define GUI components for 3 basics actions
         actionBar = QtGui.QToolBar()
 
         actionBar.addAction(self.playAction)
         actionBar.addAction(self.pauseAction)
         actionBar.addAction(self.stopAction)
 
-        #Defining seek slider
+        # Defining seek slider
         self.seekSlider = Phonon.SeekSlider(self)
         self.seekSlider.setMediaObject(self.mediaObject)
 
-        #Defining palette and lcd time
+        # Defining palette and lcd time
         palette = QtGui.QPalette()
         palette.setBrush(QtGui.QPalette.Light, QtCore.Qt.darkGray)
 
         self.timeLcd = QtGui.QLCDNumber()
         self.timeLcd.setPalette(palette)
 
-        #Defining volume icon and slider
+        # Defining volume icon and slider
         volumeLabel = QtGui.QLabel()
         volumeLabel.setPixmap(QtGui.QPixmap('images/volume.png'))
 
         self.volumeSlider = Phonon.VolumeSlider(self)
         self.volumeSlider.setAudioOutput(self.audioOutput)
         self.volumeSlider.setSizePolicy(QtGui.QSizePolicy.Maximum,
-                QtGui.QSizePolicy.Maximum)
+                                        QtGui.QSizePolicy.Maximum)
 
-        #Defining seekerLayout which include seek slider and lcd time
+        # Defining seekerLayout which include seek slider and lcd time
         seekerLayout = QtGui.QHBoxLayout()
         seekerLayout.addWidget(self.seekSlider)
         seekerLayout.addWidget(self.timeLcd)
 
-        #Defining playbackLayout which inlcude seekerLayout and volumeSlider with icon
+        # Defining playbackLayout which inlcude seekerLayout and volumeSlider
+        # with icon
         playbackLayout = QtGui.QHBoxLayout()
         playbackLayout.addWidget(actionBar)
         playbackLayout.addStretch()
         playbackLayout.addWidget(volumeLabel)
         playbackLayout.addWidget(self.volumeSlider)
 
-        #Defining mainLayout which include seekerLayout and playbackLayout
+        # Defining mainLayout which include seekerLayout and playbackLayout
         mainLayout = QtGui.QVBoxLayout()
         mainLayout.addLayout(seekerLayout)
         mainLayout.addLayout(playbackLayout)
 
-        #Defining Player box which include mainLayout
+        # Defining Player box which include mainLayout
         box = gui.widgetBox(self.controlArea, 'Player')
         box.layout().addLayout(mainLayout)

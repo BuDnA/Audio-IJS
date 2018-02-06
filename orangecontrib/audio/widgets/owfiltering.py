@@ -13,7 +13,9 @@ from Orange.widgets import widget, gui, settings
 
 import biosppy.signals.tools as st
 from scipy.io.wavfile import read, write
-import os, time, numpy
+import os
+import time
+import numpy
 
 filter_designs = [
     "Finite Impulse Response",
@@ -24,7 +26,7 @@ filter_designs = [
     "Bessel"
 ]
 
-band_types =[
+band_types = [
     "Low-pass",
     "High-pass",
     "Band-pass",
@@ -33,6 +35,7 @@ band_types =[
 
 error_red = 'QWidget { color:#f9221b;}'
 success_green = 'QWidget { color:#42f442;}'
+
 
 class OWFiltering(widget.OWWidget):
     name = "Filtering"
@@ -63,45 +66,96 @@ class OWFiltering(widget.OWWidget):
         self.new_tmp_dirs = []
 
         info_box = gui.widgetBox(self.controlArea, "Info")
-        self.info = gui.widgetLabel(info_box, 'No data on input yet, waiting to get something.')
+        self.info = gui.widgetLabel(
+            info_box, 'No data on input yet, waiting to get something.')
 
-        self.filter_designs_combo = gui.comboBox(self.controlArea, self, "filter_design_id",
-                                          box="Filter designs",
-                                          items=[m for m in filter_designs],
-                                          )
+        self.filter_designs_combo = gui.comboBox(
+            self.controlArea,
+            self,
+            "filter_design_id",
+            box="Filter designs",
+            items=[
+                m for m in filter_designs],
+        )
         self.filter_designs_combo.activated.connect(self.onDesignChange)
 
-        self.band_types_combo = gui.comboBox(self.controlArea, self, "band_type_id",
-                                                 box="Band types",
-                                                 items=[m for m in band_types],
-                                                 )
+        self.band_types_combo = gui.comboBox(
+            self.controlArea,
+            self,
+            "band_type_id",
+            box="Band types",
+            items=[
+                m for m in band_types],
+        )
         self.band_types_combo.activated.connect(self.onTypeChange)
 
         parameters_box = gui.widgetBox(self.controlArea, 'Parameters')
         self.first_cutoff_spin = gui.spin(
-            parameters_box, self, "first_cutoff", minv=1, maxv=10000, controlWidth=80,
-            alignment=Qt.AlignRight, label="First cutoff frequency [Hz]: ", spinType=float, decimals=2)
+            parameters_box,
+            self,
+            "first_cutoff",
+            minv=1,
+            maxv=10000,
+            controlWidth=80,
+            alignment=Qt.AlignRight,
+            label="First cutoff frequency [Hz]: ",
+            spinType=float,
+            decimals=2)
         self.second_cutoff_spin = gui.spin(
-            parameters_box, self, "second_cutoff", minv=1, maxv=10000, controlWidth=80,
-            alignment=Qt.AlignRight, label="Second cutoff frequency [Hz]: ", spinType=float, decimals=2)
+            parameters_box,
+            self,
+            "second_cutoff",
+            minv=1,
+            maxv=10000,
+            controlWidth=80,
+            alignment=Qt.AlignRight,
+            label="Second cutoff frequency [Hz]: ",
+            spinType=float,
+            decimals=2)
         self.filter_order_spin = gui.spin(
-            parameters_box, self, "filter_order", minv=1, maxv=10000, controlWidth=80,
-            alignment=Qt.AlignRight, label="Order: ")
+            parameters_box,
+            self,
+            "filter_order",
+            minv=1,
+            maxv=10000,
+            controlWidth=80,
+            alignment=Qt.AlignRight,
+            label="Order: ")
         self.maximum_ripple_spin = gui.spin(
-            parameters_box, self, "maximum_ripple", minv=1, maxv=10000, controlWidth=80,
-            alignment=Qt.AlignRight, label="Maximum ripple [dB]: ", spinType=float, decimals=2)
+            parameters_box,
+            self,
+            "maximum_ripple",
+            minv=1,
+            maxv=10000,
+            controlWidth=80,
+            alignment=Qt.AlignRight,
+            label="Maximum ripple [dB]: ",
+            spinType=float,
+            decimals=2)
         self.minimum_attenuation_spin = gui.spin(
-            parameters_box, self, "minimum_attenuation", minv=1, maxv=10000, controlWidth=80,
-            alignment=Qt.AlignRight, label="Minimum attenuation [dB]: ", spinType=float, decimals=2)
+            parameters_box,
+            self,
+            "minimum_attenuation",
+            minv=1,
+            maxv=10000,
+            controlWidth=80,
+            alignment=Qt.AlignRight,
+            label="Minimum attenuation [dB]: ",
+            spinType=float,
+            decimals=2)
 
-        self.filter_button = gui.button(self.controlArea, self, "Filter",
-                                        callback=lambda: self.call_filter(self.filter_designs_combo.currentText(),
-                                                                          self.band_types_combo.currentText(),
-                                                                          self.first_cutoff,
-                                                                          self.second_cutoff,
-                                                                          self.filter_order,
-                                                                          self.maximum_ripple,
-                                                                          self.minimum_attenuation))
+        self.filter_button = gui.button(
+            self.controlArea,
+            self,
+            "Filter",
+            callback=lambda: self.call_filter(
+                self.filter_designs_combo.currentText(),
+                self.band_types_combo.currentText(),
+                self.first_cutoff,
+                self.second_cutoff,
+                self.filter_order,
+                self.maximum_ripple,
+                self.minimum_attenuation))
 
         self.onDesignChange()
 
@@ -117,7 +171,8 @@ class OWFiltering(widget.OWWidget):
             self.info.setText('%d instances in input data set' % len(dataset))
             self.data = dataset
         else:
-            self.infoa.setText('No data on input yet, waiting to get something.')
+            self.infoa.setText(
+                'No data on input yet, waiting to get something.')
             self.send("Filtered data", None)
 
     def allSpinHandle(self, handle):
@@ -166,7 +221,15 @@ class OWFiltering(widget.OWWidget):
         else:
             self.second_cutoff_spin.setEnabled(False)
 
-    def call_filter(self, filter_type, filter_band, first_cutoff, second_cutoff, order, max_ripple, min_attenuation):
+    def call_filter(
+            self,
+            filter_type,
+            filter_band,
+            first_cutoff,
+            second_cutoff,
+            order,
+            max_ripple,
+            min_attenuation):
         """
         Call specified filter function on all audio clips
 
@@ -200,18 +263,26 @@ class OWFiltering(widget.OWWidget):
                     if len(input_data.shape) > 1:
                         input_data = input_data[:, 0]
 
-                if filterType == "FIR" or filterType =="butter" or filterType == "bessel":
-                    if filterBand  == "lowpass" or filterBand == "highpass":
-                        filtered = st.filter_signal(input_data, ftype=filterType, band=filterBand, order=order,
-                                                    frequency=first_cutoff, sampling_rate=self.data.metas[i][-1])
+                if filterType == "FIR" or filterType == "butter" or filterType == "bessel":
+                    if filterBand == "lowpass" or filterBand == "highpass":
+                        filtered = st.filter_signal(input_data,
+                                                    ftype=filterType,
+                                                    band=filterBand,
+                                                    order=order,
+                                                    frequency=first_cutoff,
+                                                    sampling_rate=self.data.metas[i][-1])
                     else:
                         filtered = st.filter_signal(input_data, ftype=filterType, band=filterBand, order=order,
                                                     frequency=[first_cutoff, second_cutoff],
                                                     sampling_rate=self.data.metas[i][-1])
                 elif filterType == "cheby1":
                     if filterBand == "lowpass" or filterBand == "highpass":
-                        filtered = st.filter_signal(input_data, ftype=filterType, band=filterBand, order=order,
-                                                    frequency=first_cutoff, sampling_rate=self.data.metas[i][-1],
+                        filtered = st.filter_signal(input_data,
+                                                    ftype=filterType,
+                                                    band=filterBand,
+                                                    order=order,
+                                                    frequency=first_cutoff,
+                                                    sampling_rate=self.data.metas[i][-1],
                                                     rp=max_ripple)
                     else:
                         filtered = st.filter_signal(input_data, ftype=filterType, band=filterBand, order=order,
@@ -219,8 +290,12 @@ class OWFiltering(widget.OWWidget):
                                                     rp=max_ripple)
                 elif filterType == "cheby2":
                     if filterBand == "lowpass" or filterBand == "highpass":
-                        filtered = st.filter_signal(input_data, ftype=filterType, band=filterBand, order=order,
-                                                    frequency=first_cutoff, sampling_rate=self.data.metas[i][-1],
+                        filtered = st.filter_signal(input_data,
+                                                    ftype=filterType,
+                                                    band=filterBand,
+                                                    order=order,
+                                                    frequency=first_cutoff,
+                                                    sampling_rate=self.data.metas[i][-1],
                                                     rs=min_attenuation)
                     else:
                         filtered = st.filter_signal(input_data, ftype=filterType, band=filterBand, order=order,
@@ -229,23 +304,38 @@ class OWFiltering(widget.OWWidget):
 
                 else:
                     if filterBand == "lowpass" or filterBand == "highpass":
-                        filtered = st.filter_signal(input_data, ftype=filterType, band=filterBand, order=order,
-                                                    frequency=first_cutoff, sampling_rate=self.data.metas[i][-1],
-                                                    rp=max_ripple, rs=min_attenuation)
+                        filtered = st.filter_signal(input_data,
+                                                    ftype=filterType,
+                                                    band=filterBand,
+                                                    order=order,
+                                                    frequency=first_cutoff,
+                                                    sampling_rate=self.data.metas[i][-1],
+                                                    rp=max_ripple,
+                                                    rs=min_attenuation)
                     else:
-                        filtered = st.filter_signal(input_data, ftype=filterType, band=filterBand, order=order,
-                                                    frequency=[first_cutoff, second_cutoff], sampling_rate=self.data.metas[i][-1],
-                                                    rp=max_ripple, rs=min_attenuation)
+                        filtered = st.filter_signal(input_data,
+                                                    ftype=filterType,
+                                                    band=filterBand,
+                                                    order=order,
+                                                    frequency=[first_cutoff,
+                                                               second_cutoff],
+                                                    sampling_rate=self.data.metas[i][-1],
+                                                    rp=max_ripple,
+                                                    rs=min_attenuation)
 
-
-                self.new_tmp_dir =  os.path.dirname(self.data.metas[i][1]) + os.sep + "filtered-" + self.tmp_dir_id + os.sep
+                self.new_tmp_dir = os.path.dirname(
+                    self.data.metas[i][1]) + os.sep + "filtered-" + self.tmp_dir_id + os.sep
 
                 if not os.path.exists(self.new_tmp_dir):
                     os.makedirs(self.new_tmp_dir)
                     self.new_tmp_dirs.append(self.new_tmp_dir)
 
                 filename = self.new_tmp_dir + self.data.metas[i][0] + ".wav"
-                self.metas.append([self.data.metas[i][0], filename, self.data.metas[i][2], self.data.metas[i][3], self.data.metas[i][4]])
+                self.metas.append([self.data.metas[i][0],
+                                   filename,
+                                   self.data.metas[i][2],
+                                   self.data.metas[i][3],
+                                   self.data.metas[i][4]])
 
                 data = filtered["signal"]
                 data = data / data.max()
@@ -258,19 +348,22 @@ class OWFiltering(widget.OWWidget):
 
         if not error:
             self.info.setStyleSheet(success_green)
-            self.info.setText(filter_type + " " + filter_band + " " + "filter successful!")
+            self.info.setText(
+                filter_type +
+                " " +
+                filter_band +
+                " " +
+                "filter successful!")
             orange_table = Orange.data.Table.from_numpy(
-                    self.data.domain, numpy.empty((len(self.data.Y), 0), dtype=float),
-                    self.data.Y, self.metas
-                )
+                self.data.domain, numpy.empty((len(self.data.Y), 0), dtype=float),
+                self.data.Y, self.metas
+            )
 
             self.send("Filtered data", orange_table)
         if error:
             self.info.setStyleSheet(error_red)
             self.info.setText("An error occurred:\n{}".format(error))
             return
-
-
 
     def convertTypeToStr(self, filter_type):
         """
@@ -306,12 +399,3 @@ class OWFiltering(widget.OWWidget):
             import shutil
             for i in self.new_tmp_dirs:
                 shutil.rmtree(i)
-
-
-
-
-
-
-
-
-

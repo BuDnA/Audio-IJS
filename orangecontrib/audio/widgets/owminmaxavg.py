@@ -6,11 +6,12 @@ from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
 import Orange.data
-from Orange.data import ContinuousVariable,Domain, StringVariable, Table, DiscreteVariable
+from Orange.data import ContinuousVariable, Domain, StringVariable, Table, DiscreteVariable
 from Orange.widgets import widget, gui
 
 error_red = 'QWidget { color:#f9221b;}'
 success_green = 'QWidget { color:#42f442;}'
+
 
 class OWMinMaxAvgWidget(widget.OWWidget):
     name = "Min/Avg/Max"
@@ -28,7 +29,8 @@ class OWMinMaxAvgWidget(widget.OWWidget):
     def __init__(self):
         super().__init__()
         box = gui.widgetBox(self.controlArea, "Info")
-        self.info = gui.widgetLabel(box, 'No data on input yet, waiting to get something.')
+        self.info = gui.widgetLabel(
+            box, 'No data on input yet, waiting to get something.')
 
     def set_data(self, dataset):
         """
@@ -47,7 +49,8 @@ class OWMinMaxAvgWidget(widget.OWWidget):
 
                 if classification_dict is None:
                     self.send("Min/Max/Avg features", None)
-                    self.info.setText("Please get classification probabilities")
+                    self.info.setText(
+                        "Please get classification probabilities")
                     return
 
             except Exception as ex:
@@ -58,7 +61,8 @@ class OWMinMaxAvgWidget(widget.OWWidget):
                 self.info.setText("Task successfully completed")
 
                 data = self.process_data(classification_dict)
-                orange_table = self.make_orange_table(data[0], data[1], data[2], dataset.domain.metas)
+                orange_table = self.make_orange_table(
+                    data[0], data[1], data[2], dataset.domain.metas)
                 self.send("Min/Max/Avg features", orange_table)
 
             if error:
@@ -67,7 +71,8 @@ class OWMinMaxAvgWidget(widget.OWWidget):
                 return
 
         else:
-            self.info.setText('No data on input yet, waiting to get something.')
+            self.info.setText(
+                'No data on input yet, waiting to get something.')
             self.send("Min/Max/Avg features", None)
 
     def make_classification_dict(self, dataset):
@@ -87,7 +92,7 @@ class OWMinMaxAvgWidget(widget.OWWidget):
             class_value = i.get_class()
             tmp = metas[0].split("_")
             segment_name = ""
-            for i in range(len(tmp) -1):
+            for i in range(len(tmp) - 1):
                 segment_name += tmp[i] + "_"
             segment_name = segment_name[:-1] + ".wav"
             print(segment_name)
@@ -97,11 +102,16 @@ class OWMinMaxAvgWidget(widget.OWWidget):
             for x in range(5, len(metas)):
                 if str(type(meta_attrs[x])) == "ContinuousVariable":
                     if meta_attrs[x] not in classification_dict[segment_name]:
-                        classification_dict[segment_name][meta_attrs[x]] = collections.defaultdict(list)
-                        classification_dict[segment_name][meta_attrs[x]] = [0,2,0,0, str(class_value)]
-                    classification_dict[segment_name][meta_attrs[x]][0] += metas[x]
-                    classification_dict[segment_name][meta_attrs[x]][1] = min(classification_dict[segment_name][meta_attrs[x]][1], metas[x] )
-                    classification_dict[segment_name][meta_attrs[x]][2] = max(classification_dict[segment_name][meta_attrs[x]][2], metas[x] )
+                        classification_dict[segment_name][meta_attrs[x]] = collections.defaultdict(
+                            list)
+                        classification_dict[segment_name][meta_attrs[x]] = [
+                            0, 2, 0, 0, str(class_value)]
+                    classification_dict[segment_name][meta_attrs[x]
+                                                      ][0] += metas[x]
+                    classification_dict[segment_name][meta_attrs[x]][1] = min(
+                        classification_dict[segment_name][meta_attrs[x]][1], metas[x])
+                    classification_dict[segment_name][meta_attrs[x]][2] = max(
+                        classification_dict[segment_name][meta_attrs[x]][2], metas[x])
                     classification_dict[segment_name][meta_attrs[x]][3] += 1
 
         return classification_dict
@@ -147,15 +157,19 @@ class OWMinMaxAvgWidget(widget.OWWidget):
         :return: orange table with category, file name, min, max and avg classification probabilities
         """
 
-        category = DiscreteVariable("Target class", values=self.discrete_atributes)
+        category = DiscreteVariable(
+            "Target class", values=self.discrete_atributes)
 
         attributes = []
 
-        for i in range(5,len(domain_metas)):
+        for i in range(5, len(domain_metas)):
             if str(type(domain_metas[i])) == "ContinuousVariable":
-                attributes.append(ContinuousVariable.make("MIN_"+str(domain_metas[i].name)))
-                attributes.append(ContinuousVariable.make("MAX_"+str(domain_metas[i].name)))
-                attributes.append(ContinuousVariable.make("AVG_"+str(domain_metas[i].name)))
+                attributes.append(ContinuousVariable.make(
+                    "MIN_" + str(domain_metas[i].name)))
+                attributes.append(ContinuousVariable.make(
+                    "MAX_" + str(domain_metas[i].name)))
+                attributes.append(ContinuousVariable.make(
+                    "AVG_" + str(domain_metas[i].name)))
 
         METAS = [('File name', 'file_name')]
         meta_attr = [StringVariable.make(meta[0]) for meta in METAS]
