@@ -11,6 +11,7 @@ import numpy
 error_red = 'QWidget { color:#f9221b;}'
 success_green = 'QWidget { color:#42f442;}'
 
+
 class OWAudioToTable(widget.OWWidget):
     name = "Audio_to_Table"
     description = "Read audio files and return raw audio data"
@@ -27,7 +28,8 @@ class OWAudioToTable(widget.OWWidget):
     def __init__(self):
         super().__init__()
         box = gui.widgetBox(self.controlArea, "Info")
-        self.info = gui.widgetLabel(box, 'No data on input yet, waiting to get something.')
+        self.info = gui.widgetLabel(
+            box, 'No data on input yet, waiting to get something.')
 
     def set_data(self, dataset):
         """
@@ -61,9 +63,9 @@ class OWAudioToTable(widget.OWWidget):
                 return
 
         else:
-            self.info.setText('No data on input yet, waiting to get something.')
+            self.info.setText(
+                'No data on input yet, waiting to get something.')
             self.send("Audio", None)
-
 
     def make_orange_table(self, dataset):
         """
@@ -86,18 +88,28 @@ class OWAudioToTable(widget.OWWidget):
                 data = data[:, 0]
             X.append(data)
 
-
         X = self.make_square_array(numpy.array(X), max(dataset.metas[:, 2]))
-        data_vars = [Orange.data.ContinuousVariable.make('n{:d}'.format(i)) for i in range(len(X[0]))]
+        data_vars = [Orange.data.ContinuousVariable.make(
+            'n{:d}'.format(i)) for i in range(len(X[0]))]
 
         if dataset.Y != []:
-            Y = DiscreteVariable.make("Category", values=dataset.domain.class_var.values, ordered=True)
+            Y = DiscreteVariable.make(
+                "Category",
+                values=dataset.domain.class_var.values,
+                ordered=True)
         else:
             Y = None
 
-        self.domain = Domain(attributes=data_vars, class_vars=Y, metas=dataset.domain.metas)
+        self.domain = Domain(
+            attributes=data_vars,
+            class_vars=Y,
+            metas=dataset.domain.metas)
 
-        orange_table = Table(self.domain, numpy.array(X), dataset.Y , dataset.metas)
+        orange_table = Table(
+            self.domain,
+            numpy.array(X),
+            dataset.Y,
+            dataset.metas)
         self.send("Audio", orange_table)
 
     def make_square_array(self, data, maximum):

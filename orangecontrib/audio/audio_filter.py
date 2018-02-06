@@ -1,6 +1,7 @@
 import numpy as np
 import biosppy.signals.tools as st
 
+
 class AudioFilter:
 
     def butter_filter(self, signal, cutoff_frequency, framerate):

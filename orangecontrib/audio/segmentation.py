@@ -4,6 +4,7 @@ import numpy as np
 from scipy.io.wavfile import read, write
 import os
 
+
 class Segmentation:
 
     def __init__(self):

@@ -14,16 +14,10 @@ class ImportData:
         """
 
         raw_data = self.import_wav(file_path)
-        #if len(raw_data[0]) > 200000:
-        #    return
+
         data = [raw_data[0], raw_data[1], raw_data[2]]
 
-        #segment_data = self.pre_segment_data(data)
-        #sorted_data = self.sort_data(data)
-
-
-        return data#self.make_square_array(sorted_data), np.array(sorted_data[1]), np.array(sorted_data[2]), np.array(sorted_data[3])
-
+        return data
 
     def sort_data(self, data):
         """
@@ -43,7 +37,6 @@ class ImportData:
                     framerate.append(data[x][3])
 
         return X, Y, metas, framerate
-
 
     def make_square_array(self, sorted_data):
         """
@@ -68,12 +61,13 @@ class ImportData:
             if len(i[0]) > avg:
                 iterations = int(len(i[0]) / avg)
                 for x in range(iterations):
-                    segment_data.append([i[0][x*avg:(x+1)*avg], i[1], i[2], i[3]])
-                segment_data.append([i[0][(iterations)*avg: len(i[0])], i[1], i[2], i[3]])
+                    segment_data.append(
+                        [i[0][x * avg:(x + 1) * avg], i[1], i[2], i[3]])
+                segment_data.append(
+                    [i[0][(iterations) * avg: len(i[0])], i[1], i[2], i[3]])
             else:
                 segment_data.append(i)
         return segment_data
-
 
     def calc_max(self, X):
         """
@@ -91,7 +85,6 @@ class ImportData:
     def calc_avg(self, data):
         return sum([len(i[0]) for i in data]) / len(data)
 
-
     def import_wav(self, file_path):
         """
         :param file_path: path to file
@@ -106,6 +99,5 @@ class ImportData:
         data = np.reshape(data, (-1, nchan))
 
         file_name = os.path.split(file_path)[-1]
-        print(len(data[:,0]))
+        print(len(data[:, 0]))
         return data[:, 0], file_name, fp.getframerate()
-
